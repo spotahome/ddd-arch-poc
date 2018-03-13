@@ -23,9 +23,20 @@ $app->get('/[{name}]', function ($request, $response, $args) {
         'payload' => $encodedUser
     );
 
-
     $encodedEvent = encode2Avro($eventPath, $event, $this->logger);
     $this->logger->info($encodedEvent);
+
+
+
+    $this->kafka->send([
+        [
+            'topic' => 'user_events',
+            'value' => $encodedEvent,
+            'key' => $id,
+        ],
+    ]);
+
+
 });
 
 function encode2Avro($avroPath, $object, $l) {
