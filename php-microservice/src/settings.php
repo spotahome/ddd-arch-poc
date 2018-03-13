@@ -13,5 +13,10 @@ return [
             'name' => 'slim-app',
             'path' => __DIR__ . '/../logs/app.log',
         ],
+
+        // Avro settings
+        'avro' => [
+            'path' => __DIR__ . '/../avro'
+        ]
     ],
 ];

@@ -17,3 +17,9 @@ $container['logger'] = function ($c) {
     $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['path'], Monolog\Logger::DEBUG));
     return $logger;
 };
+
+// avro
+$container['avro'] = function ($c) {
+    $settings = $c->get('settings')['avro'];
+    return $settings;
+};

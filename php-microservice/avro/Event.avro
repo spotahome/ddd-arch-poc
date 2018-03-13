@@ -1,0 +1,34 @@
+{  
+   "type":"record",
+   "name":"Event",
+   "namespace":"com.spotahome.events",
+   "fields":[  
+      {  
+         "name":"persistenceId",
+         "type":"string"
+      },
+      {  
+         "name":"eventId",
+         "type":"string"
+      },
+      {  
+         "name":"creationDate",
+         "type":"string"
+      },
+      {  
+         "name":"tags",
+         "type":{  
+            "type":"array",
+            "items":"string"
+         }
+      },
+      {  
+         "name":"payloadVersion",
+         "type":"string"
+      },
+      {  
+         "name":"payload",
+         "type":"bytes"
+      }
+   ]
+}
