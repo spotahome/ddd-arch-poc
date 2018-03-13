@@ -3,8 +3,8 @@
 $app->get('/[{name}]', function ($request, $response, $args) {
     $id = uniqid();
 
-    $userPath = $this->avro['path'] . "/UserWasCreated.avro";
-    $eventPath = $this->avro['path'] . "/Event.avro";
+    $userPath = $this->avro['path'] . '/UserWasCreated.avro';
+    $eventPath = $this->avro['path'] . '/Event.avro';
 
     $user = array(
         'id' => $id,
@@ -28,12 +28,12 @@ $app->get('/[{name}]', function ($request, $response, $args) {
     $this->logger->info($encodedEvent);
 });
 
-function encode2Avro($avroPath, $object, $log = NULL) {
+function encode2Avro($avroPath, $object, $l) {
     $userWasCreatedSchemaContent = file_get_contents($avroPath);
     $io = new AvroStringIO();
 
     $writersSchema = AvroSchema::parse($userWasCreatedSchemaContent);
-    $log->info($avroPath);
+    $l->info($avroPath);
 
     $writer = new AvroIODatumWriter($writersSchema);
     $dataWriter = new AvroDataIOWriter($io, $writer, $writersSchema);
@@ -41,6 +41,5 @@ function encode2Avro($avroPath, $object, $log = NULL) {
     $dataWriter->close();
 
     $binaryString = $io->string();
-
     return $binaryString;
 }
