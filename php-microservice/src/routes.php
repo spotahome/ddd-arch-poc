@@ -1,6 +1,10 @@
 <?php
 
-$app->get('/[{name}]', function ($request, $response, $args) {
+
+$app->get('/[{eventId}]', function ($request, $response, $args) {
+    
+    
+    
     $id = uniqid();
 
     $userPath = $this->avro['path'] . '/UserWasCreated.avro';
@@ -16,27 +20,22 @@ $app->get('/[{name}]', function ($request, $response, $args) {
     
     $event = array(
         'persistenceId' => $id,
-        'eventId' => '1',
-        'creationDate' => '11/10/1981',
+        'eventId' => $args['eventId'],
+        'creationDate' => date('Y-m-d H:i:s'),
         'tags' => array('UserWasCreatedEvent'),
         'payloadVersion' => '1',
-        'payload' => $encodedUser
+        'payload' => base64_encode($encodedUser)
     );
-
+    
     $encodedEvent = encode2Avro($eventPath, $event, $this->logger);
-    $this->logger->info($encodedEvent);
-
-
-
+    
     $this->kafka->send([
         [
-            'topic' => 'user_events',
-            'value' => $encodedEvent,
+            'topic' => 'userevents',
+            'value' => json_encode($event),
             'key' => $id,
         ],
     ]);
-
-
 });
 
 function encode2Avro($avroPath, $object, $l) {
