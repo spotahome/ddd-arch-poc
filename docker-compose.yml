@@ -72,6 +72,21 @@ services:
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      CONNECT_PLUGIN_PATH: '/plugins'
+    volumes:
+      - ./connect-plugins:/plugins
+
+  postgres:
+    image: postgres 
+    hostname: postgres
+    depends_on:
+      - connect
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: 'username'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'dwh'
 
   connect-ui:
     image: landoop/kafka-connect-ui
