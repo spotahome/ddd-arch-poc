@@ -73,6 +73,16 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
 
+  connect-ui:
+    image: landoop/kafka-connect-ui
+    hostname: connect-ui
+    depends_on:
+      - connect
+    ports:
+      - "8084:8000"
+    environment:
+      CONNECT_URL: 'http://connect:8083'
+
   control-center:
     image: confluentinc/cp-enterprise-control-center
     hostname: control-center
