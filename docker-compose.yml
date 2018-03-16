@@ -72,21 +72,21 @@ services:
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      CONNECT_PLUGIN_PATH: '/plugins'
+      CONNECT_PLUGIN_PATH: '/usr/share/java/kafka'
     volumes:
-      - ./connect-plugins:/plugins
+      - ./connect-plugins:/usr/share/java/kafka
 
-  postgres:
-    image: postgres 
-    hostname: postgres
+  mysql:
+    image: mysql:5.6
+    hostname: mysql
     depends_on:
       - connect
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      POSTGRES_USER: 'username'
-      POSTGRES_PASSWORD: 'password'
-      POSTGRES_DB: 'dwh'
+      MYSQL_USER: 'username'
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: 'dwh'
 
   connect-ui:
     image: landoop/kafka-connect-ui

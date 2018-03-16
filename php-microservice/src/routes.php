@@ -27,8 +27,8 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
         'payload' => base64_encode($encodedUser)
     );
     
+    /*
     $encodedEvent = encode2Avro($eventPath, $event, $this->logger);
-    
     $this->kafka->send([
         [
             'topic' => 'userevents',
@@ -36,6 +36,31 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
             'key' => $id,
         ],
     ]);
+    */
+
+    $uri = 'http://kafka-rest:10000/topics/avrotest2';
+
+    $schemaContent = json_encode(json_decode(file_get_contents($eventPath)));
+
+    $body = array(
+        'value_schema' => $schemaContent,
+        'records' => [
+            0 => array('value' => $event)
+        ]
+    );
+
+    $this->logger->info(json_encode($body));
+
+    $response = \Httpful\Request::post($uri)
+
+    ->body(json_encode($body))
+    ->addHeaders(array(
+        'Accept' => 'application/vnd.kafka.v2+json',
+        'Content-Type' => 'application/vnd.kafka.avro.v2+json',
+    ))
+    ->send();
+
+    $this->logger->info($response);
 });
 
 function encode2Avro($avroPath, $object, $l) {
