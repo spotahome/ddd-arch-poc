@@ -3,3 +3,5 @@
 **!/logs/README.md
 **/composer.lock
 **/target
+**/.idea
+**/stream.iml

@@ -7,20 +7,17 @@
          "name":"persistenceId",
          "type":"string"
       },
-      {  
+      {
          "name":"eventId",
          "type":"string"
       },
-      {  
+      {
          "name":"creationDate",
          "type":"string"
       },
       {  
-         "name":"tags",
-         "type":{  
-            "type":"array",
-            "items":"string"
-         }
+         "name":"payloadName",
+         "type":"string"
       },
       {  
          "name":"payloadVersion",
@@ -28,7 +25,7 @@
       },
       {  
          "name":"payload",
-         "type":"bytes"
+         "type":"string"
       }
    ]
 }

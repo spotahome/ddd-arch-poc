@@ -46,6 +46,7 @@ services:
       
   connect:
     image: confluentinc/cp-kafka-connect
+    #image: alvaro:connect-2
     hostname: connect
     depends_on:
       - zookeeper
@@ -72,22 +73,32 @@ services:
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      CONNECT_PLUGIN_PATH: '/usr/share/java/kafka'
-    volumes:
-      - ./connect-plugins:/usr/share/java/kafka
+      CONNECT_PLUGIN_PATH: '/usr/share/java/'
 
-  mysql:
-    image: mysql:5.6
-    hostname: mysql
+  postgres:
+    image: postgres 
+    hostname: postgres
     depends_on:
       - connect
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_USER: 'username'
-      MYSQL_ROOT_PASSWORD: 'password'
-      MYSQL_DATABASE: 'dwh'
+      POSTGRES_USER: 'username'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'dwh'
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.3
+    hostname: elasticsearch
+    depends_on:
+      - connect
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      discovery.type: 'single-node'
+      xpack.security.enabled: 'false'
+     
   connect-ui:
     image: landoop/kafka-connect-ui
     hostname: connect-ui

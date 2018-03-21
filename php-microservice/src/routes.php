@@ -22,7 +22,7 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
         'persistenceId' => $id,
         'eventId' => $args['eventId'],
         'creationDate' => date('Y-m-d H:i:s'),
-        'tags' => array('UserWasCreatedEvent'),
+        'payloadName' => 'UserWasCreatedEvent',
         'payloadVersion' => '1',
         'payload' => base64_encode($encodedUser)
     );
@@ -38,7 +38,7 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
     ]);
     */
 
-    $uri = 'http://kafka-rest:10000/topics/avrotest2';
+    $uri = 'http://kafka-rest:10000/topics/userevents';
 
     $schemaContent = json_encode(json_decode(file_get_contents($eventPath)));
 
