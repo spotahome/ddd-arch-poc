@@ -2,51 +2,30 @@
 
 
 $app->get('/[{eventId}]', function ($request, $response, $args) {
-    $id = uniqid();
+    $uri = 'http://kafka-rest:10000/topics/userevents';
+    
+    $eventId = uniqid();
+    $userId = uniqid();
 
     $userPath = $this->avro['path'] . '/UserWasCreated.avro';
     $eventPath = $this->avro['path'] . '/Event.avro';
 
-/*
     $user = array(
-        'id' => $id,
-        'name' => 'name_' . $id,
-        'email' => 'email_' . $id . '@domain.com'
+        'id' => $userId,
+        'name' => 'name_' . $userId,
+        'email' => 'email_' . $userId . '@domain.com'
     );
-    */
-
-    $user = array(
-        'id' => '1',
-        'name' => 'name_',
-        'email' => 'email_'
-    );
-
 
     $encodedUser = encode2Avro($userPath, $user, $this->logger);
-
-    $this->logger->info('>>>>>>>>>>>>>>>> ' . $encodedUser);
     
     $event = array(
-        'persistenceId' => '1',//$id,
-        'eventId' => $args['eventId'],
-        'creationDate' => '1',//date('Y-m-d H:i:s'),
-        'payloadName' => '1',//'UserWasCreatedEvent',
+        'persistenceId' => $userId,
+        'eventId' => $eventId,
+        'creationDate' => date('Y-m-d H:i:s'),
+        'payloadName' => 'UserWasCreatedEvent',
         'payloadVersion' => '1',
         'payload' => base64_encode($encodedUser)
     );
-    
-    /*
-    $encodedEvent = encode2Avro($eventPath, $event, $this->logger);
-    $this->kafka->send([
-        [
-            'topic' => 'userevents',
-            'value' => json_encode($event),
-            'key' => $id,
-        ],
-    ]);
-    */
-
-    $uri = 'http://kafka-rest:10000/topics/userevents';
 
     $schemaContent = json_encode(json_decode(file_get_contents($eventPath)));
 
@@ -58,7 +37,6 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
     );
 
     $response = \Httpful\Request::post($uri)
-
     ->body(json_encode($body))
     ->addHeaders(array(
         'Accept' => 'application/vnd.kafka.v2+json',
@@ -72,13 +50,10 @@ function encode2Avro($avroPath, $object, $l) {
     $io = new AvroStringIO();
 
     $writersSchema = AvroSchema::parse($userWasCreatedSchemaContent);
-    $l->info($avroPath);
 
     $writer = new AvroIODatumWriter($writersSchema);
-    $dataWriter = new AvroDataIOWriter($io, $writer, $writersSchema);
-    $dataWriter->append($object);
-    $dataWriter->close();
+    $encoder = new AvroIOBinaryEncoder($io);
+    $writer->write($object, $encoder);
 
-    $binaryString = $io->string();
-    return $binaryString;
+    return $io->string();
 }

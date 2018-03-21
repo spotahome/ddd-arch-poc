@@ -8,7 +8,7 @@ import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Consumer
 import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.stream._
-import com.sksamuel.avro4s.{AvroInputStream, AvroSchema, RecordFormat, SchemaFor}
+import com.sksamuel.avro4s.{AvroInputStream, RecordFormat}
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import org.apache.avro.generic.GenericRecord
@@ -29,8 +29,6 @@ case class User(id: String,
 object AkkaStream extends App {
 
   implicit val system = ActorSystem("stream-example")
-
-  //implicit val userSchema = AvroSchema[User]
 
   private val schemaRegistryClient = new CachedSchemaRegistryClient("http://localhost:8081", 1000)
 
@@ -54,20 +52,16 @@ object AkkaStream extends App {
     .withGroupId(UUID.randomUUID().toString)
     .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
 
-
-
   Consumer.committableSource(consumerSettings, Subscriptions.topics("userevents"))
     .map {
       _.record.value().asInstanceOf[GenericRecord]
     }.runForeach { record =>
     val event = format.from(record)
     val payload = Base64.getDecoder.decode(event.payload)
+    val in = new ByteArrayInputStream(payload)
+    val input = AvroInputStream.binary[User](in)
+    val user = input.iterator.toSeq.head
 
-    println(payload)
-
-//    println(result.head)
-
+    println(user)
   }
-
-
 }
