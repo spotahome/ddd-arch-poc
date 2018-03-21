@@ -2,27 +2,35 @@
 
 
 $app->get('/[{eventId}]', function ($request, $response, $args) {
-    
-    
-    
     $id = uniqid();
 
     $userPath = $this->avro['path'] . '/UserWasCreated.avro';
     $eventPath = $this->avro['path'] . '/Event.avro';
 
+/*
     $user = array(
         'id' => $id,
         'name' => 'name_' . $id,
         'email' => 'email_' . $id . '@domain.com'
     );
+    */
+
+    $user = array(
+        'id' => '1',
+        'name' => 'name_',
+        'email' => 'email_'
+    );
+
 
     $encodedUser = encode2Avro($userPath, $user, $this->logger);
+
+    $this->logger->info('>>>>>>>>>>>>>>>> ' . $encodedUser);
     
     $event = array(
-        'persistenceId' => $id,
+        'persistenceId' => '1',//$id,
         'eventId' => $args['eventId'],
-        'creationDate' => date('Y-m-d H:i:s'),
-        'payloadName' => 'UserWasCreatedEvent',
+        'creationDate' => '1',//date('Y-m-d H:i:s'),
+        'payloadName' => '1',//'UserWasCreatedEvent',
         'payloadVersion' => '1',
         'payload' => base64_encode($encodedUser)
     );
@@ -49,8 +57,6 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
         ]
     );
 
-    $this->logger->info(json_encode($body));
-
     $response = \Httpful\Request::post($uri)
 
     ->body(json_encode($body))
@@ -59,8 +65,6 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
         'Content-Type' => 'application/vnd.kafka.avro.v2+json',
     ))
     ->send();
-
-    $this->logger->info($response);
 });
 
 function encode2Avro($avroPath, $object, $l) {

@@ -1,23 +1,45 @@
-package com.anistal.streamexample
+package com.dddarchpoc
 
+import java.io.ByteArrayInputStream
 import java.security.MessageDigest
+import java.util.{Base64, UUID}
 
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Consumer
 import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.stream._
-import akka.stream.scaladsl.{Flow, GraphDSL, RunnableGraph, Sink}
-import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
+import com.sksamuel.avro4s.{AvroInputStream, AvroSchema, RecordFormat, SchemaFor}
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
+import org.apache.avro.generic.GenericRecord
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
+
+case class Event(persistenceId: String,
+                 eventId: String,
+                 creationDate: String,
+                 payloadName: String,
+                 payloadVersion: String,
+                 payload: String)
+
+case class User(id: String,
+                name: String,
+                email: String)
 
 object AkkaStream extends App {
 
   implicit val system = ActorSystem("stream-example")
 
+  //implicit val userSchema = AvroSchema[User]
+
+  private val schemaRegistryClient = new CachedSchemaRegistryClient("http://localhost:8081", 1000)
+
   val decider: Supervision.Decider = { exception =>
     exception.printStackTrace
     Supervision.Resume
   }
+
+  val format = RecordFormat[Event]
 
   val materializerSettings = ActorMaterializerSettings(system).withSupervisionStrategy(decider)
   implicit val materializer = ActorMaterializer(materializerSettings)
@@ -26,42 +48,26 @@ object AkkaStream extends App {
   val bootstrapServer = "localhost:9092"
 
   val messageDigestInstance = MessageDigest.getInstance("MD5")
-  val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
+  val consumerSettings = ConsumerSettings(system, new StringDeserializer, new KafkaAvroDeserializer(schemaRegistryClient))
+    .withProperty("schema.registry.url", "http://localhost:8081")
     .withBootstrapServers(bootstrapServer)
-    .withGroupId("group")
+    .withGroupId(UUID.randomUUID().toString)
     .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
 
-  val calculateMD5 = Flow[ConsumerRecord[String, String]].map { event =>
-    val m = java.security.MessageDigest.getInstance("MD5")
-    val b = event.value().getBytes("UTF-8")
-    m.update(b, 0, b.length)
-    new java.math.BigInteger(1, m.digest()).toString(16)
+
+
+  Consumer.committableSource(consumerSettings, Subscriptions.topics("userevents"))
+    .map {
+      _.record.value().asInstanceOf[GenericRecord]
+    }.runForeach { record =>
+    val event = format.from(record)
+    val payload = Base64.getDecoder.decode(event.payload)
+
+    println(payload)
+
+//    println(result.head)
+
   }
 
-  val calculateMD5String = Flow[String].map { event =>
-    val m = java.security.MessageDigest.getInstance("MD5")
-    val b = event.getBytes("UTF-8")
-    m.update(b, 0, b.length)
-    new java.math.BigInteger(1, m.digest()).toString(16)
-  }
-
-  // @formatter:off
-  val g = RunnableGraph.fromGraph(GraphDSL.create() {
-    implicit builder =>
-      import GraphDSL.Implicits._
-
-      val A: Outlet[ConsumerRecord[String, String]] =
-        builder.add(Consumer.plainSource(consumerSettings, Subscriptions.topics("bookings"))).out
-      val B: FlowShape[ConsumerRecord[String, String], String] = builder.add(calculateMD5.async)
-      val C: Inlet[Any] = builder.add(Sink.ignore).in
-
-      // Graph
-      A ~> B ~> C
-
-      ClosedShape
-  })
-  // @formatter:on
-
-  g.run()
 
 }
