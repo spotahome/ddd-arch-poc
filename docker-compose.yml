@@ -24,6 +24,7 @@ services:
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:9092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -186,7 +187,7 @@ services:
     volumes_from:
       - app
   
-  stream:
+  akka-stream:
     build: docker/scala-akka-stream
     volumes:
       - ./scala-akka-stream:/scala-akka-stream

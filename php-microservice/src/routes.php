@@ -37,12 +37,12 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
     );
 
     $response = \Httpful\Request::post($uri)
-    ->body(json_encode($body))
-    ->addHeaders(array(
-        'Accept' => 'application/vnd.kafka.v2+json',
-        'Content-Type' => 'application/vnd.kafka.avro.v2+json',
-    ))
-    ->send();
+        ->body(json_encode($body))
+        ->addHeaders(array(
+            'Accept' => 'application/vnd.kafka.v2+json',
+            'Content-Type' => 'application/vnd.kafka.avro.v2+json',
+        ))
+        ->send();
 });
 
 function encode2Avro($avroPath, $object, $l) {
