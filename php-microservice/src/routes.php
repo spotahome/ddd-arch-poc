@@ -2,7 +2,7 @@
 
 
 $app->get('/[{eventId}]', function ($request, $response, $args) {
-    $uri = 'http://kafka-rest:10000/topics/userevents';
+    $uri = 'http://kafka-rest:10000/topics/events.user';
     
     $eventId = uniqid();
     $userId = uniqid();

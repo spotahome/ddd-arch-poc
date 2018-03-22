@@ -74,6 +74,8 @@ object AkkaStream extends App {
 
       val genericUser = UserFormat.to(user)
 
+      println(user)
+
       ProducerMessage.Message(
         new ProducerRecord[String, Object](SinkTopicName, genericUser),
         message.committableOffset
