@@ -9,6 +9,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
   broker:
     image: confluentinc/cp-enterprise-kafka
@@ -25,11 +27,14 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:9092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'true'
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+
 
   schema_registry:
     image: confluentinc/cp-schema-registry
@@ -44,6 +49,8 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+      SCHEMA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      SCHEMA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
       
   connect:
     image: confluentinc/cp-kafka-connect
@@ -74,6 +81,8 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       CONNECT_PLUGIN_PATH: '/usr/share/java'
+      CONNECT_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      CONNECT_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
   postgres:
     image: postgres 
@@ -128,6 +137,8 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021 
+      CONTROL_CENTER_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      CONTROL_CENTER_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
   schema-registry-ui: 
     image: landoop/schema-registry-ui
@@ -153,6 +164,8 @@ services:
       KAFKA_REST_HOST_NAME: 'kafka-rest'
       KAFKA_REST_LISTENERS: 'http://0.0.0.0:10000'
       KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema_registry:8081'
+      KAFKA_REST_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      KAFKA_REST_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
 
   kafka-topics-ui: 
     image: landoop/kafka-topics-ui
