@@ -46,10 +46,10 @@ $app->get('/[{eventId}]', function ($request, $response, $args) {
 });
 
 function encode2Avro($avroPath, $object, $l) {
-    $userWasCreatedSchemaContent = file_get_contents($avroPath);
+    $schemaContent = file_get_contents($avroPath);
     $io = new AvroStringIO();
 
-    $writersSchema = AvroSchema::parse($userWasCreatedSchemaContent);
+    $writersSchema = AvroSchema::parse($schemaContent);
 
     $writer = new AvroIODatumWriter($writersSchema);
     $encoder = new AvroIOBinaryEncoder($io);
