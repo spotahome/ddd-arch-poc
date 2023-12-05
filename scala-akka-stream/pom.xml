@@ -22,7 +22,7 @@
         <akka.version>2.5.9</akka.version>
         <scala-maven.tests.plugin.version>2.19.1</scala-maven.tests.plugin.version>
         <scala-maven.plugin.version>3.2.2</scala-maven.plugin.version>
-        <logback-classic.version>1.2.3</logback-classic.version>
+        <logback-classic.version>1.2.13</logback-classic.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
